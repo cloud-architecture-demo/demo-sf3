@@ -18,10 +18,6 @@ resource "aws_iam_role" "eks" {
   ]
 }
 POLICY
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 ## Attach AWS policy to EKS cluster Control Plane IAM role.
@@ -67,10 +63,6 @@ resource "aws_iam_role" "main-node" {
   ]
 }
 POLICY
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 ## Attach EKS worker node policy to EKS worker node (main-node) IAM role.
