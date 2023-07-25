@@ -1,0 +1,144 @@
+apiVersion: jenkins.io/v1alpha2
+kind: Jenkins
+metadata:
+  name: prod-jenkins
+spec:
+  service:
+    type: LoadBalancer
+    port: 8080
+  configurationAsCode:
+    configurations: []
+    secret:
+      name: ""
+  groovyScripts:
+    configurations: []
+    secret:
+      name: ""
+  jenkinsAPISettings:
+    authorizationStrategy: createUser
+  master:
+    disableCSRFProtection: true
+    basePlugins:
+    - name: kubernetes
+      version: "1.5.1"
+    - name: kubernetes-cli
+      version: "1.12.0"
+    - name: workflow-job
+      version: "1295.v395eb_7400005"
+    - name: workflow-aggregator
+      version: "2.6"
+    - name: git
+      version: "4.10.2"
+    - name: job-dsl
+      version: "1.78.3"
+    - name: configuration-as-code
+      version: "1625.v27444588cc3d"
+    - name: kubernetes-credentials-provider
+      version: "0.20"
+    containers:
+      - name: jenkins-master
+        image: jenkins/jenkins:2.375.2-lts
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+          - containerPort: 50000
+        livenessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /login
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 130
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /login
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 80
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 1500m
+            memory: 1Gi
+        securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+  seedJobs:
+  - id: hello-world-demo
+    targets: "jenkins-seed-jobs/hello-world/jobs/hello_world.jenkins"
+    description: "Hello World Demo - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-carts-build
+    targets: "jenkins-seed-jobs/socks-shop/carts/build/jobs/carts_build_job.jenkins"
+    description: "Socks Shop - Carts Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-catalogue-build
+    targets: "jenkins-seed-jobs/socks-shop/catalogue/build/jobs/catalogue_build_job.jenkins"
+    description: "Socks Shop - Catalogue Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-front-end-build
+    targets: "jenkins-seed-jobs/socks-shop/front-end/build/jobs/front_end_build_job.jenkins"
+    description: "Socks Shop - Front-End Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-orders-build
+    targets: "jenkins-seed-jobs/socks-shop/orders/build/jobs/orders_build_job.jenkins"
+    description: "Socks Shop - Orders Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-payment-build
+    targets: "jenkins-seed-jobs/socks-shop/payment/build/jobs/payment_build_job.jenkins"
+    description: "Socks Shop - Payment Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-queue-master-build
+    targets: "jenkins-seed-jobs/socks-shop/queue-master/build/jobs/queue_master_build_job.jenkins"
+    description: "Socks Shop - Queue-Master Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-shipping-build
+    targets: "jenkins-seed-jobs/socks-shop/shipping/build/jobs/shipping_build_job.jenkins"
+    description: "Socks Shop - Shipping Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+  - id: socks-shop-user-build
+    targets: "jenkins-seed-jobs/socks-shop/user/build/jobs/user_build_job.jenkins"
+    description: "Socks Shop - User Build - Jenkins Operator"
+    repositoryBranch: demo-sf3
+    repositoryUrl: https://github.com/cloud-architecture-demo/sock-shop-configuration.git
+---
+#apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins-server-ing
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jenkins-operator-http-prod-jenkins
+            port:
+              number: 8080
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jenkins-operator-slave-prod-jenkins
+            port:
+              number: 50000
