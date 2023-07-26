@@ -32,6 +32,6 @@ git clone https://github.com/cloud-architecture-demo/demo-sf3.git
 cd demo-sf3
 
 terraform init
-terraform plan
+terraform plan -var-file secrets.tfvars
 terraform apply -var-file secrets.tfvars
 ```
