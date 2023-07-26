@@ -133,3 +133,66 @@ kubectl -n sock-shop get svc front-end
 ```
 > Once the address is displayed, you can copy it into a browser window and observe the ArgoCD UI on port `80`.
 >
+
+<br>
+
+At this point, your demo should be deployed and the access information displayed on your terminal screen. Congrats!
+
+> NOTE: 
+>
+> When deploying Jenkins, ArgoCD or the Sock Shop app, please be patient while the automation stands them up, they might not yet be ready to start accepting connections. If you are browsing for them and the application doesn't seem to be available, wait a minute for the containers to deploy fully, then refresh your browser page.
+
+<br>
+
+> NOTE: 
+>
+> Container build pipelines in the Jenkins CICD server are configured to publish images to the docker **Elastic Container Registry** that was created by terraform, in the `demosf3` AWS project.
+>> 
+>> You should be able to list the details about the Sock Shop docker registry by running the following gcloud command:
+>> ```
+>> aws ecr describe-repositories
+>> ```
+>> Scroll up and down with the Up/Down arrow keys and press `q` to exit, dropping back to the commandline prompt.
+
+<br>
+
+##### Destroy:
+Step 1: Change directories into the code directory.
+```
+cd ./demo-sf3
+```
+
+<br>
+
+
+Step 2: Destroy demo-sf3.
+```
+terraform destroy -var-file secrets.tfvars
+```
+
+<br>
+
+<br>
+
+---
+
+<br>
+
+
+##### Additional Resources:
+
+- [ArgoCD](https://argo-cd.readthedocs.io/)
+- [Get started with ArgoCD](https://argo-cd.readthedocs.io/en/stable/getting_started/)
+- [ArgoCD Operator Manual](https://argo-cd.readthedocs.io/en/stable/operator-manual/architecture/)
+
+##### Videos:
+- [Introduction to Argo CD : Kubernetes DevOps CI/CD](https://youtu.be/2WSJF7d8dUg)
+- [ArgoCD Starter Guide: Full Tutorial for ArgoCD in Kubernetes)](https://youtu.be/JLrR9RV9AFA)
+
+<br>
+
+<br>
+
+---
+
+<br>
