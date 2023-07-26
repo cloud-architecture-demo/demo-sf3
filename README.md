@@ -33,5 +33,5 @@ cd demo-sf3
 
 terraform init
 terraform plan
-terraform apply -var-file=/path/to/your/specific.tfvars
+terraform apply -var-file secrets.tfvars
 ```
